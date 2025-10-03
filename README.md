@@ -45,16 +45,8 @@ aws cloudformation create-stack \
     ParameterKey=InstanceType,ParameterValue=t3.micro \
     ParameterKey=SecurityGroupId,ParameterValue=sg-04f4c192bcfcf3f2b
 
-## Notas sobre nombres en CloudFormation
 
-- **Nombre del stack**:  
-  El nombre definido en `--stack-name` **no se puede cambiar** una vez creado el stack.  
-  Si necesitas corregirlo, debes ejecutar un `delete-stack` para eliminarlo y luego un `create-stack` con el nombre correcto.
-
-- **Nombre de la instancia (tag Name)**:  
-  El nombre que recibe la instancia EC2 (ej. `econtreras`) sí se puede cambiar mediante un `update-stack`, modificando el valor del parámetro `InstanceName`.  
-
-Ejemplo de actualización solo del nombre de la instancia:
+Actualizando con comando CLI CloudFormation (Nombre Instancia, Tipo Instancia)
 
 ```bash
 aws cloudformation update-stack \
@@ -66,6 +58,6 @@ aws cloudformation update-stack \
   --parameters \
     ParameterKey=VpcId,ParameterValue=vpc-086fe118b4ed5c6e4 \
     ParameterKey=SubnetId,ParameterValue=subnet-0f86fb485374f9f0a \
-    ParameterKey=InstanceType,ParameterValue=t3.micro \
+    ParameterKey=InstanceType,ParameterValue=t3.medium \
     ParameterKey=InstanceName,ParameterValue=nuevo-nombre \
     ParameterKey=SecurityGroupId,ParameterValue=sg-04f4c192bcfcf3f2b
