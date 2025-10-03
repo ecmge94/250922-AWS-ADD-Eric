@@ -63,3 +63,14 @@ aws cloudformation update-stack \
     ParameterKey=InstanceName,ParameterValue=nuevo-nombre \
     ParameterKey=SecurityGroupId,ParameterValue=sg-04f4c192bcfcf3f2b
 ```
+
+## Eliminar un Stack
+
+Si necesitas eliminar el stack creado, puedes usar el siguiente comando:
+
+```bash
+aws cloudformation delete-stack \
+  --stack-name econtreras-654654327431 \
+  --region us-east-1 \
+  --profile default
+```
