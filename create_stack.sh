@@ -18,34 +18,55 @@ SUBNET2="subnet-0323a098b70caa778"
 TAG_NAME="WebServer-Econtreras"
 MIN_SIZE="2"
 MAX_SIZE="4"
-DESIRED_CAPACITY="2"
+DESIRED_CAPACITY="3"
 
 # Permitir sobreescribir los valores por argumentos de entorno
 MIN_SIZE="${MIN_SIZE:-1}"
 MAX_SIZE="${MAX_SIZE:-1}"
 DESIRED_CAPACITY="${DESIRED_CAPACITY:-1}"
 
-# Crear el stack de CloudFormation
-aws cloudformation create-stack \
-  --stack-name "$STACK_NAME" \
-  --template-body file://"$TEMPLATE_FILE" \
-  --capabilities CAPABILITY_IAM \
-  --region "$REGION" \
-  --profile "$PROFILE" \
-  --parameters \
-    ParameterKey=LatestAmiId,ParameterValue="$LATEST_AMI_ID" \
-    ParameterKey=VpcId,ParameterValue="$VPC_ID" \
-    ParameterKey=SubnetId,ParameterValue="$SUBNET_ID" \
-    ParameterKey=InstanceType,ParameterValue="$INSTANCE_TYPE" \
-    ParameterKey=InstanceName,ParameterValue="$INSTANCE_NAME" \
-    ParameterKey=SecurityGroupId,ParameterValue="$SECURITY_GROUP_ID" \
-    ParameterKey=LaunchTemplateName,ParameterValue="$LAUNCH_TEMPLATE_NAME" \
-    ParameterKey=AutoScalingGroupName,ParameterValue="$AUTOSCALING_GROUP_NAME" \
-    ParameterKey=Subnet1,ParameterValue="$SUBNET1" \
-    ParameterKey=Subnet2,ParameterValue="$SUBNET2" \
-    ParameterKey=TagName,ParameterValue="$TAG_NAME" \
-    ParameterKey=MinSize,ParameterValue="$MIN_SIZE" \
-    ParameterKey=MaxSize,ParameterValue="$MAX_SIZE" \
-    ParameterKey=DesiredCapacity,ParameterValue="$DESIRED_CAPACITY"
+# Parámetros comunes para create/update
+CFN_PARAMS=(
+  ParameterKey=LatestAmiId,ParameterValue="$LATEST_AMI_ID"
+  ParameterKey=VpcId,ParameterValue="$VPC_ID"
+  ParameterKey=SubnetId,ParameterValue="$SUBNET_ID"
+  ParameterKey=InstanceType,ParameterValue="$INSTANCE_TYPE"
+  ParameterKey=InstanceName,ParameterValue="$INSTANCE_NAME"
+  ParameterKey=SecurityGroupId,ParameterValue="$SECURITY_GROUP_ID"
+  ParameterKey=LaunchTemplateName,ParameterValue="$LAUNCH_TEMPLATE_NAME"
+  ParameterKey=AutoScalingGroupName,ParameterValue="$AUTOSCALING_GROUP_NAME"
+  ParameterKey=Subnet1,ParameterValue="$SUBNET1"
+  ParameterKey=Subnet2,ParameterValue="$SUBNET2"
+  ParameterKey=TagName,ParameterValue="$TAG_NAME"
+  ParameterKey=MinSize,ParameterValue="$MIN_SIZE"
+  ParameterKey=MaxSize,ParameterValue="$MAX_SIZE"
+  ParameterKey=DesiredCapacity,ParameterValue="$DESIRED_CAPACITY"
+)
 
-echo "Stack $STACK_NAME creado exitosamente (proceso iniciado)."
+# Verificar si el stack ya existe
+aws cloudformation describe-stacks \
+  --stack-name "$STACK_NAME" \
+  --region "$REGION" \
+  --profile "$PROFILE" &> /dev/null
+
+if [ $? -eq 0 ]; then
+  echo "El stack ya existe, actualizando..."
+  aws cloudformation update-stack \
+    --stack-name "$STACK_NAME" \
+    --template-body file://"$TEMPLATE_FILE" \
+    --capabilities CAPABILITY_IAM \
+    --region "$REGION" \
+    --profile "$PROFILE" \
+    --parameters "${CFN_PARAMS[@]}"
+  echo "Stack $STACK_NAME actualizado (proceso iniciado)."
+else
+  echo "El stack no existe, creando..."
+  aws cloudformation create-stack \
+    --stack-name "$STACK_NAME" \
+    --template-body file://"$TEMPLATE_FILE" \
+    --capabilities CAPABILITY_IAM \
+    --region "$REGION" \
+    --profile "$PROFILE" \
+    --parameters "${CFN_PARAMS[@]}"
+  echo "Stack $STACK_NAME creado exitosamente (proceso iniciado)."
+fi
