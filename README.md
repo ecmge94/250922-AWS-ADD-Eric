@@ -74,3 +74,35 @@ aws cloudformation delete-stack \
   --region us-east-1 \
   --profile default
 ```
+
+## Uso de scripts automatizados
+
+Se incluyen dos scripts para facilitar la creación y eliminación del stack:
+
+### Crear el stack
+
+```bash
+# Puedes personalizar la cantidad de instancias con variables de entorno:
+MIN_SIZE=2 MAX_SIZE=3 DESIRED_CAPACITY=2 ./create_stack.sh
+```
+
+Si no defines las variables, se usarán los valores por defecto (1 instancia).
+
+### Eliminar el stack
+
+```bash
+./delete_stack.sh
+```
+
+---
+
+## Parámetros personalizables
+
+Puedes modificar los siguientes parámetros en el despliegue:
+- `MinSize`: Mínimo de instancias en el Auto Scaling Group
+- `MaxSize`: Máximo de instancias en el Auto Scaling Group
+- `DesiredCapacity`: Capacidad deseada de instancias en el Auto Scaling Group
+
+Estos parámetros se pueden definir como variables de entorno al ejecutar el script de creación.
+
+---
